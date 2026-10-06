@@ -11,13 +11,10 @@ def home(request):
     })
 
 
-def health(request):
-    return JsonResponse({
-        "status": "ok"
-    })
-
-
 def health_check(request):
+    server_id = os.environ.get("SERVER_ID", "unknown")
+
     return JsonResponse({
-        "status": "healthy"
+        "status": "healthy",
+        "server": server_id
     })
