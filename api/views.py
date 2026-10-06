@@ -18,3 +18,13 @@ def health_check(request):
         "status": "healthy",
         "server": server_id
     })
+
+
+def server_info(request):
+    server_id = os.environ.get("SERVER_ID", "unknown")
+
+    return JsonResponse({
+        "service": "django-load-balancer",
+        "server": server_id,
+        "status": "running"
+    })
