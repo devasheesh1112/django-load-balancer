@@ -1,19 +1,31 @@
+
 from django.http import JsonResponse
 import os
+from itertools import count
+from threading import Lock
+
+server_id = os.environ.get("SERVER_ID", "unknown")
+
+_request_count = count(1)
+_request_lock = Lock()
+requests_handled = 0
 
 
 def home(request):
-    server_id = os.environ.get("SERVER_ID", "unknown")
+    global requests_handled
+
+    with _request_lock:
+        requests_handled += 1
+        current_count = requests_handled
 
     return JsonResponse({
         "message": "Hello from Django",
-        "server": server_id
+        "server": server_id,
+        "request_number": current_count
     })
 
 
 def health_check(request):
-    server_id = os.environ.get("SERVER_ID", "unknown")
-
     return JsonResponse({
         "status": "healthy",
         "server": server_id
@@ -21,10 +33,9 @@ def health_check(request):
 
 
 def server_info(request):
-    server_id = os.environ.get("SERVER_ID", "unknown")
-
     return JsonResponse({
         "service": "django-load-balancer",
         "server": server_id,
-        "status": "running"
+        "status": "running",
+        "requests_handled": requests_handled
     })
